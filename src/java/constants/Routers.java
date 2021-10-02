@@ -17,6 +17,7 @@ public class Routers {
 	public final static String REGISTER_PAGE = "/WEB-INF/view/register.jsp";
 	public final static String LOGIN_PAGE = "/WEB-INF/view/login.jsp";
 	public final static String INDEX_PAGE = "/WEB-INF/view/index.jsp";
+	public final static String UPDATE_USER_FROM_ADMIN_PAGE = "/WEB-INF/view/updateUser.jsp";
 
 	//router mapping
 	public final static String ADMIN_CONTROLLER = "AdminController";
@@ -24,5 +25,6 @@ public class Routers {
 	public final static String REGISTER_CONTROLLER = "RegisterController";
 	public final static String LOGIN_CONTROLLER = "LoginController";
 	public final static String INDEX_CONTROLLER = "IndexController";
+	public final static String UPDATE_USER_FROM_ADMIN_CONTROLLER = "UpdateUserInfoController";
 
 }

@@ -7,6 +7,7 @@ package controller;
 
 import constants.Routers;
 import dao.UserDAO;
+import helper.GetParam;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ public class AdminController extends HttpServlet {
 	 */
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 		throws ServletException, IOException, Exception {
+		String fullName = GetParam.getStringParam(request, "fullName", "FullName", 0, 30, "");
+		System.out.println(fullName);
 
 	}
 
@@ -67,7 +70,6 @@ public class AdminController extends HttpServlet {
 				list = (ArrayList<User>) userDao.getAllUser();
 			} catch (Exception ex) {
 				list = null;
-				System.out.println("Hello");
 			}
 		}
 
@@ -86,7 +88,11 @@ public class AdminController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws ServletException, IOException {
-
+		try {
+			processRequest(request, response);
+		} catch (Exception ex) {
+			Logger.getLogger(AdminController.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 	/**

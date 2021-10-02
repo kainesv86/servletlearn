@@ -9,6 +9,8 @@ import constants.Routers;
 import dao.UserDAO;
 import helper.GetParam;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Objects;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,8 +24,8 @@ import moddel.User;
  *
  * @author Kaine
  */
-@WebServlet(name = "UpdatePasswordController", urlPatterns = {"/UpdatePasswordController"})
-public class UpdatePasswordController extends HttpServlet {
+@WebServlet(name = "UpdateUserInfoController", urlPatterns = {"/UpdateUserInfoController"})
+public class UpdateUserInfoController extends HttpServlet {
 
 	/**
 	 * Processes requests for both HTTP <code>GET</code> and
@@ -35,54 +37,59 @@ public class UpdatePasswordController extends HttpServlet {
 	 * @throws IOException if an I/O error occurs
 	 */
 	protected boolean processRequest(HttpServletRequest request, HttpServletResponse response)
-		throws Exception {
+		throws ServletException, IOException, Exception {
 		UserDAO userDao = new UserDAO();
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+//		HttpSession session = request.getSession();
+//		User user = (User) session.getAttribute("user");
+//		if (user.getRole() != 1) {
+//			response.sendRedirect(Routers.INDEX_CONTROLLER);
+//			return false;
+//		}
 
-		if (user.getFullName() == null) {
-			response.sendRedirect(Routers.LOGIN_CONTROLLER);
-		}
-
-		Integer passwordUser;
+//		String fullName = GetParam.getStringParam(request, "fullName", "Fullname", 0, 0, null);
+//		request.setAttribute("fullName", fullName);
+//		System.out.println(fullName);
+		Integer role, newPassword, confirmPassword;
+		String fullName = null;
 		try {
-			passwordUser = userDao.getUserByName(user.getFullName()).getPassword();
-		} catch (Exception e) {
-			request.setAttribute("errorMessage", "Something got error from passwordUser");
-			return false;
-		}
-
-		Integer password, newPassword, confirmPassword;
-		try {
-			password = GetParam.getIntParams(request, "password", "Password", 0, Integer.MAX_VALUE, null);
+			fullName = GetParam.getStringParam(request, "fullName", "Fullname", 0, 30, null);
 			newPassword = GetParam.getIntParams(request, "newPassword", "new password", 0, Integer.MAX_VALUE, null);
 			confirmPassword = GetParam.getIntParams(request, "confirmPassword", "confirm password", 0, Integer.MAX_VALUE, null);
+			role = GetParam.getIntParams(request, "role", "role", 0, Integer.MAX_VALUE, null);
 		} catch (Exception e) {
-			password = null;
 			newPassword = null;
 			confirmPassword = null;
+			role = null;
 		}
 
-		if (password == null || !Objects.equals(password, passwordUser)) {
-			System.out.println(Objects.equals(password, passwordUser));
-			request.setAttribute("passwordError", "Password error is not correct");
+		if (fullName != null) {
+			User userInfo = userDao.getUserByName(fullName);
+			request.setAttribute("userInfo", userInfo);
+		}
+
+		if (newPassword == null) {
+			request.setAttribute("newPassword", "newPassword is not correct");
 			return false;
 		}
 
-		if (!Objects.equals(newPassword, confirmPassword) || confirmPassword == null || newPassword == null) {
+		if (!Objects.equals(newPassword, confirmPassword) || confirmPassword == null) {
 			request.setAttribute("confirmPassword", "Confirm password is not correct");
 			return false;
 		}
 
-		if (!userDao.updatePasswordByName(user, newPassword)) {
-			request.setAttribute("errorMessage", "Something got error database");
+		if (role == null) {
+			request.setAttribute("role", "Role is not empty");
 			return false;
 		}
 
+		if (!userDao.updateInfoFromAdmin(fullName, newPassword, role)) {
+			request.setAttribute("errorMessage", "Something got error database");
+			return false;
+		}
 		return true;
 	}
 
-// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
 	/**
 	 * Handles the HTTP <code>GET</code> method.
 	 *
@@ -94,7 +101,20 @@ public class UpdatePasswordController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 		throws ServletException, IOException {
-		request.getRequestDispatcher(Routers.UPDATE_PASSWORD_PAGE).forward(request, response);
+
+		String fullName = GetParam.getStringParam(request, "fullName", "Fullname", 0, 100, null);
+
+		UserDAO userDao = new UserDAO();
+		try {
+			User userInfo = userDao.getUserByName(fullName);
+			System.out.println("userInfo: " + userInfo.getFullName());
+			request.setAttribute("userInfo", userInfo);
+		} catch (Exception e) {
+		}
+
+//
+//
+		request.getRequestDispatcher(Routers.UPDATE_USER_FROM_ADMIN_PAGE).forward(request, response);
 	}
 
 	/**
@@ -110,12 +130,13 @@ public class UpdatePasswordController extends HttpServlet {
 		throws ServletException, IOException {
 		try {
 			if (processRequest(request, response)) {
-				response.sendRedirect(Routers.INDEX_CONTROLLER);
+				response.sendRedirect(Routers.ADMIN_CONTROLLER);
 				return;
 			}
-			request.getRequestDispatcher(Routers.UPDATE_PASSWORD_PAGE).forward(request, response);
+//			System.out.println("UserInfo:" + request.getAttribute("userInfo"));
+			request.getRequestDispatcher(Routers.UPDATE_USER_FROM_ADMIN_PAGE).forward(request, response);
 		} catch (Exception e) {
-			System.out.println("Something got error");
+			System.out.println("Something got error 1");
 		}
 	}
 

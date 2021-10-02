@@ -62,7 +62,6 @@ public class IndexController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws ServletException, IOException {
-//		processRequest(request, response);
 		request.getRequestDispatcher(Routers.INDEX_PAGE).forward(request, response);
 	}
 

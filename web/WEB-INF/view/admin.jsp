@@ -18,7 +18,12 @@
                         <c:if test="${requestScope.userList != null}">
                             <div>userId - fullName - role</div>
                             <c:forEach items="${requestScope.userList}" var="user">
-                                <div>${user.toString()}</div>
+                                <form method="POST" action="UpdateUserInfoController">
+                                        <p>${user.toString()}
+                                                <a  href="UpdateUserInfoController?fullName=${user.getFullName()}">Update</a>
+                                        </p>
+
+                                </form>
                             </c:forEach>
                         </c:if>
                 </div>

@@ -97,7 +97,6 @@ public class UserDAO {
 
 	public boolean updatePasswordByName(User user, Integer newPassword) throws Exception {
 		try {
-			System.out.println("Did you  want to work!");
 			conn = Connector.getConnection();
 			String sql = "UPDATE tbl_User set password=? where fullName=?";
 
@@ -106,6 +105,24 @@ public class UserDAO {
 			preStm.setString(2, user.getFullName());
 			preStm.executeUpdate();
 			System.out.println("Work pls");
+		} catch (Exception e) {
+			return false;
+		} finally {
+			this.closeConnection();
+		}
+		return true;
+	}
+
+	public boolean updateInfoFromAdmin(String fullName, Integer newPassword, Integer role) throws Exception {
+		try {
+			conn = Connector.getConnection();
+			String sql = "UPDATE tbl_User set password=?, role=?   where fullName=?";
+
+			preStm = conn.prepareStatement(sql);
+			preStm.setInt(1, newPassword);
+			preStm.setInt(2, role);
+			preStm.setString(3, fullName);
+			preStm.executeUpdate();
 		} catch (Exception e) {
 			return false;
 		} finally {
